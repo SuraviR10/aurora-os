@@ -81,6 +81,9 @@ void kernel_main(uint32_t magic, void *mbi) {
     settings_init();
     boot_step("System settings loaded");
 
+    packages_init();
+    boot_step("Package manager initialized");
+
     /* 8. AuroraLang runtime */
     aurora_runtime_init();
     boot_step("AuroraLang runtime initialized");

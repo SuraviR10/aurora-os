@@ -48,7 +48,7 @@ static token_type_t lookup_keyword(const char *s) {
 }
 
 static void emit(lexer_t *l, token_type_t t, const char *lex, int ival, double fval) {
-    if (l->tok_count >= MAX_NODES) return;
+    if (l->tok_count >= AST_MAX_NODES) return;
     token_t *tk = &l->tokens[l->tok_count++];
     tk->type = t;
     tk->line = l->line;

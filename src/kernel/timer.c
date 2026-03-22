@@ -8,7 +8,7 @@
 #define PIT_CMD   0x43
 #define PIT_BASE  1193182u   /* Hz */
 
-static volatile uint64_t ticks = 0;
+static volatile uint32_t ticks = 0;
 static uint32_t tick_hz = 100;
 
 static void timer_irq(void) {
@@ -27,5 +27,5 @@ void timer_init(uint32_t hz) {
     outb(0x21, inb(0x21) & ~0x01);
 }
 
-uint64_t timer_ticks(void)   { return ticks; }
-uint32_t timer_seconds(void) { return (uint32_t)(ticks / tick_hz); }
+uint32_t timer_ticks(void)   { return ticks; }
+uint32_t timer_seconds(void) { return ticks / tick_hz; }

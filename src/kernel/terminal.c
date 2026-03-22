@@ -96,7 +96,8 @@ void term_printf(const char *fmt, ...) {
         fmt++;
         switch (*fmt) {
         case 's': { const char *s = __builtin_va_arg(ap, const char*);
-                    if (!s) s = "(null)"; term_write(s); break; }
+                    if (!s) s = "(null)";
+                    term_write(s); break; }
         case 'd': { int v = __builtin_va_arg(ap, int);
                     kitoa(v, buf, 10); term_write(buf); break; }
         case 'u': { unsigned v = __builtin_va_arg(ap, unsigned);

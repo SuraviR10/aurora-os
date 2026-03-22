@@ -12,9 +12,9 @@
 #define WINDOW_COLOR 0x70
 #define TITLEBAR_COLOR 0x2F
 
-void print_char(char c, int x, int y, uint32_t color);
-void print_string(const char *str, int x, int y, uint32_t color);
-void draw_line(int x1, int y1, int x2, int y2, uint32_t color);
+static void desktop_print_char(char c, int x, int y, uint32_t color);
+static void desktop_print_string(const char *str, int x, int y, uint32_t color);
+static void draw_line(int x1, int y1, int x2, int y2, uint32_t color);
 
 typedef struct {
     int id;
@@ -28,8 +28,8 @@ typedef struct {
     int connection_count;
 } ui_node_t;
 
-#define MAX_NODES 16
-ui_node_t nodes[MAX_NODES];
+#define MAX_UI_NODES 16
+ui_node_t nodes[MAX_UI_NODES];
 int node_count = 0;
 int focused_node = -1;
 char desktop_icons[16][32];
@@ -38,17 +38,18 @@ char desktop_icons[16][32];
 bool desktop_mode = false;
 
 // Forward declarations
-void set_focused_node(int index);
-void draw_node(ui_node_t *node);
+static void set_focused_node(int index);
+static void draw_node(ui_node_t *node);
+static void draw_line(int x1, int y1, int x2, int y2, uint32_t color);
 
 // Drawing Primitives Implementation
-void print_char(char c, int x, int y, uint32_t color) {
+static void desktop_print_char(char c, int x, int y, uint32_t color) {
     term_set_cursor(x, y);
     term_setcolor((uint8_t)color);
     term_putchar(c);
 }
 
-void print_string(const char *str, int x, int y, uint32_t color) {
+static void desktop_print_string(const char *str, int x, int y, uint32_t color) {
     term_set_cursor(x, y);
     term_setcolor((uint8_t)color);
     term_write(str);
@@ -63,8 +64,8 @@ void desktop_init() {
 }
 
 // Create a window
-int create_node(const char *title, int x, int y, int width, int height) {
-    if (node_count >= MAX_NODES) return -1;
+static int create_node(const char *title, int x, int y, int width, int height) {
+    if (node_count >= MAX_UI_NODES) return -1;
 
     int index = node_count++;
     nodes[index].id = index + 1; // ID is 1-based
@@ -86,7 +87,7 @@ int create_node(const char *title, int x, int y, int width, int height) {
 }
 
 // Set focused window
-void set_focused_node(int index) {
+static void set_focused_node(int index) {
     if (focused_node >= 0 && focused_node < node_count) {
         nodes[focused_node].focused = false;
     }
@@ -103,13 +104,13 @@ void draw_desktop() {
     // Clear screen with desktop color
     for (int y = 0; y < SCREEN_HEIGHT; y++) {
         for (int x = 0; x < SCREEN_WIDTH; x++) {
-            print_char(' ', x, y, DESKTOP_COLOR);
+            desktop_print_char(' ', x, y, DESKTOP_COLOR);
         }
     }
 
     // Draw desktop title
-    print_string("AuroraOS Fluid Interface", 1, 0, 0x1F);
-    print_string("ESC for shell | 'connect <id1> <id2>'", 40, 0, 0x1F);
+    desktop_print_string("AuroraOS Fluid Interface", 1, 0, 0x1F);
+    desktop_print_string("ESC for shell | 'connect <id1> <id2>'", 40, 0, 0x1F);
 
     // Draw connections first (so they are in the background)
     for (int i = 0; i < node_count; i++) {
@@ -135,7 +136,7 @@ void draw_desktop() {
 }
 
 // Draw a window
-void draw_node(ui_node_t *node) {
+static void draw_node(ui_node_t *node) {
     uint32_t color = node->background_color;
     if (node->focused) {
         color = (color & 0xF0) | 0x0F; // Brighter for focused
@@ -146,20 +147,18 @@ void draw_node(ui_node_t *node) {
         for (int x = node->x; x < node->x + node->width; x++) {
             if (y == node->y || y == node->y + node->height - 1 ||
                 x == node->x || x == node->x + node->width - 1) {
-                print_char(' ', x, y, TITLEBAR_COLOR);
+                desktop_print_char(' ', x, y, TITLEBAR_COLOR);
             } else {
-                print_char(' ', x, y, color);
+                desktop_print_char(' ', x, y, color);
             }
         }
     }
 
     // Title bar
-    char title_buf[32];
-    // sprintf is not freestanding. We need a custom implementation. For now, manual.
-    print_string(node->title, node->x + 2, node->y, TITLEBAR_COLOR);
+    desktop_print_string(node->title, node->x + 2, node->y, TITLEBAR_COLOR);
 
     // Close button
-    print_char('X', node->x + node->width - 2, node->y, 0x4F);
+    desktop_print_char('X', node->x + node->width - 2, node->y, 0x4F);
 
     // Window content
     int content_y = node->y + 1;
@@ -171,7 +170,7 @@ void draw_node(ui_node_t *node) {
         }
 
         for (char *c = line; c < end; c++) {
-            print_char(*c, node->x + 1 + (c - line), content_y, color);
+            desktop_print_char(*c, node->x + 1 + (c - line), content_y, color);
         }
 
         if (*end == '\n') {
@@ -230,17 +229,14 @@ bool is_desktop_mode() {
 }
 
 // Simple line drawing for the fluid interface connections
-void draw_line(int x1, int y1, int x2, int y2, uint32_t color) {
-    // Draw horizontal segment
+static void draw_line(int x1, int y1, int x2, int y2, uint32_t color) {
     for (int x = (x1 < x2 ? x1 : x2); x <= (x1 > x2 ? x1 : x2); x++) {
-        print_char('-', x, y1, color);
+        desktop_print_char('-', x, y1, color);
     }
-    // Draw vertical segment
     for (int y = (y1 < y2 ? y1 : y2); y <= (y1 > y2 ? y1 : y2); y++) {
-        print_char('|', x2, y, color);
+        desktop_print_char('|', x2, y, color);
     }
-    // Draw corner
-    print_char('+', x2, y1, color);
+    desktop_print_char('+', x2, y1, color);
 }
 
 void desktop_show_info() {

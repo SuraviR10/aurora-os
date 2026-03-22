@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define MAX_NODES 1024
+#define AST_MAX_NODES 1024
 #define MAX_CHILDREN 16
 
 // --- Token Types ---
@@ -97,7 +97,7 @@ typedef struct {
 } ast_node_t;
 
 typedef struct {
-    ast_node_t nodes[1024];
+    ast_node_t nodes[AST_MAX_NODES];
     int count;
 } ast_t;
 
@@ -144,7 +144,7 @@ typedef struct {
     const char *source;
     int pos;
     int line;
-    token_t tokens[MAX_NODES]; // Simple fixed size buffer
+    token_t tokens[AST_MAX_NODES]; // Simple fixed size buffer
     int tok_count;
     int tok_pos;
 } lexer_t;

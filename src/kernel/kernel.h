@@ -185,6 +185,13 @@ void vfs_tag(const char *path, const char *tag);
 int vfs_read(const char *path, void *buf, uint32_t *size);
 int vfs_mkdir(const char *path);
 int vfs_delete(const char *path);
+void vfs_ls(const char *path);
+
+// Desktop
+void desktop_init();
+void desktop_show_info();
+void desktop_list_nodes();
+void desktop_connect_nodes(int id1, int id2);
 
 // Services
 void timeline_init();

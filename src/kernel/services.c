@@ -272,7 +272,7 @@ void settings_set(const char *key, const char *value) {
 
 static void draw_bar(uint32_t used, uint32_t total, int width) {
     if (total == 0) return;
-    int filled = (int)((uint64_t)used * width / total);
+    int filled = (total > 0) ? (int)(used / (total / width)) : 0;
     term_write("  [");
     uint8_t bar_color = VGA_COLOR(VGA_LIGHT_GREEN, VGA_BLACK);
     if (filled > width * 7 / 10) bar_color = VGA_COLOR(VGA_LIGHT_BROWN, VGA_BLACK);

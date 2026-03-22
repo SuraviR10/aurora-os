@@ -30,7 +30,7 @@ static int find_node(const char *path) {
     return -1;
 }
 
-static void build_path(const char *parent, const char *name, char *out) {
+static __attribute__((unused)) void build_path(const char *parent, const char *name, char *out) {
     if (kstrcmp(parent, "/") == 0)
         ksnprintf(out, VFS_MAX_PATH, "/%s", name);
     else

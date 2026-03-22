@@ -7,7 +7,7 @@
 
 /* ── AST helpers ───────────────────────────────────────────────────── */
 int ast_alloc(ast_t *a, node_type_t t) {
-    if (a->count >= MAX_NODES) return -1;
+    if (a->count >= AST_MAX_NODES) return -1;
     int idx = a->count++;
     kmemset(&a->nodes[idx], 0, sizeof(ast_node_t));
     a->nodes[idx].type = t;
